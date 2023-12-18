@@ -2,39 +2,33 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+use crate::model::conversation::{Conversation, Message};
+
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
+    let (conversation, set_conversation) = create_signal(Conversation::new());
+    let send = create_action(move |new_message: &string| {
+        let user_message = Message {
+            text: new_message.clone(),
+            user: true,
+        };
+        set_conversation.update(move |c| {
+            c.messages.push(user_message);
+        })
+
+        // TODO: converse
+    });
+
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos_start.css"/>
 
         // sets the document title
-        <Title text="Welcome to Leptos"/>
-
-        // content for this welcome page
-        <Router>
-            <main>
-                <Routes>
-                    <Route path="" view=HomePage/>
-                    <Route path="/*any" view=NotFound/>
-                </Routes>
-            </main>
-        </Router>
-    }
-}
-
-/// Renders the home page of your application.
-#[component]
-fn HomePage() -> impl IntoView {
-    // Creates a reactive value to update the button
-    let (count, set_count) = create_signal(0);
-    let on_click = move |_| set_count.update(|count| *count += 1);
-
-    view! {
-        <h1>"Welcome to Rusty llama!!!!"</h1>
-        <button on:click=on_click>"Click Me: " {count}</button>
+        <Title text="Rusty Llama"/>
+        <CharArea conversation/>
+        <TypeArea send/>
     }
 }
 
